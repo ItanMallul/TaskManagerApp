@@ -18,7 +18,18 @@
     --border-focus: #4f46e5;
 
     --success: #10b981;
-    --danger: #ef4444;
+  --danger: #ef4444;
+  --warning: #f59e0b; /* Yellow/Amber */
+
+  /* Task Priority Colors */
+  --task-bg-green: #d1fae5;
+  --task-border-green: #10b981;
+  
+  --task-bg-red: #fee2e2;
+  --task-border-red: #ef4444;
+  
+  --task-bg-yellow: #fffbeb;
+  --task-border-yellow: #fbbf24;
 
     /* Spacing & Shapes */
     --radius-sm: 8px;
