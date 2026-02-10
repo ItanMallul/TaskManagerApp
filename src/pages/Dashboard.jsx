@@ -23,12 +23,12 @@ export default function Dashboard({ user, onLogout }) {
 
     // Load tasks on mount
     useEffect(() => {
-        const storeKey = `taskApp_tasks_${user.name}`;
+        const storeKey = `taskApp_tasks_${user.username}`;
         const stored = localStorage.getItem(storeKey);
         if (stored) {
             setTasks(JSON.parse(stored));
         }
-    }, [user.name]);
+    }, [user.username]);
 
     /**
      * Persist tasks to LocalStorage and update state
@@ -36,7 +36,7 @@ export default function Dashboard({ user, onLogout }) {
      */
     const saveTasks = (updatedTasks) => {
         setTasks(updatedTasks);
-        localStorage.setItem(`taskApp_tasks_${user.name}`, JSON.stringify(updatedTasks));
+        localStorage.setItem(`taskApp_tasks_${user.username}`, JSON.stringify(updatedTasks));
     };
 
     /**
@@ -146,7 +146,7 @@ export default function Dashboard({ user, onLogout }) {
                         <span>TaskMaster</span>
                     </div>
                     <div className="user-controls flex-center">
-                        <span className="welcome">Hello, {user.name}</span>
+                        <span className="welcome">Hello, {user.username}</span>
                         <button onClick={onLogout} className="btn-icon" title="Logout">
                             <LogOut size={20} />
                         </button>

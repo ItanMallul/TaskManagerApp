@@ -1,40 +1,96 @@
 import { useState, useEffect } from 'react';
-import LandingPage from './pages/LandingPage';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import { getCurrentUser, logout } from './api/auth';
+
+// Protected Route wrapper component
+function ProtectedRoute({ children }) {
+    const user = getCurrentUser();
+
+    if (!user) {
+        return <Navigate to="/" replace />;
+    }
+
+    return children;
+}
+
+// Public Route wrapper - redirects to dashboard if already logged in
+function PublicRoute({ children }) {
+    const user = getCurrentUser();
+
+    if (user) {
+        return <Navigate to="/dashboard" replace />;
+    }
+
+    return children;
+}
 
 function App() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Check for existing authentication on mount
     useEffect(() => {
-        const storedUser = localStorage.getItem('taskApp_user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+            setUser(currentUser);
         }
         setLoading(false);
     }, []);
 
-    const handleLogin = (username) => {
-        const newUser = { id: Date.now(), name: username };
-        setUser(newUser);
-        localStorage.setItem('taskApp_user', JSON.stringify(newUser));
-    };
-
     const handleLogout = () => {
+        logout();
         setUser(null);
-        localStorage.removeItem('taskApp_user');
     };
 
-    if (loading) return null; // Or a loading spinner
+    if (loading) {
+        return (
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh',
+                fontSize: '1.2rem',
+                color: '#666'
+            }}>
+                Loading...
+            </div>
+        );
+    }
 
     return (
-        <div className="app-container">
-            {user ? (
-                <Dashboard user={user} onLogout={handleLogout} />
-            ) : (
-                <LandingPage onLogin={handleLogin} />
-            )}
-        </div>
+        <Router>
+            <Routes>
+                <Route
+                    path="/"
+                    element={
+                        <PublicRoute>
+                            <Login />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/register"
+                    element={
+                        <PublicRoute>
+                            <Register />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard user={user} onLogout={handleLogout} />
+                        </ProtectedRoute>
+                    }
+                />
+                {/* Fallback route */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </Router>
     );
 }
 
